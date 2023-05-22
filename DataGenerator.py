@@ -8,13 +8,22 @@ class DataGenerator(keras.utils.Sequence):
     def __init__(self, data_directory, batch_size):
         self.directory = data_directory
         self.batch = batch_size
+        self.sample_count = len(os.listdir(self.directory))//2
     
     def __len__(self):
-        return math.ceil((len(os.listdir(self.directory))//2) / self.batch)
+        return math.ceil(self.sample_count / self.batch)
     
     def __getitem__(self, index):
-        (lx, ly) = self.__parseSample(index)
-        return (np.array([lx]), np.array([ly]))
+        first = index * self.batch
+        last = min((index + 1) * self.batch, self.sample_count)
+        lx = []
+        ly = []
+        for i in range(first, last):
+            (x, y) = self.__parseSample(i)
+            lx.append(x)
+            ly.append(y)
+        # (lx, ly) = self.__parseSample(index)
+        return (np.array(lx), np.array(ly))
 
     def __stringToMultiDimArray(self, st):
         helper_stack = deque()
